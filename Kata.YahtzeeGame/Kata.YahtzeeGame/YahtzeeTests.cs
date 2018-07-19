@@ -19,20 +19,52 @@ namespace Kata.YahtzeeGame
         [Test]
         public void PlayerRolls_Ones_CalculatesCorrectScore()
         {
-            var player = new Player();
+            var fakeDice = new FakeDice(setAllRollsTo: 1);
+            var player = new Player(fakeDice);
+
             var yahtzee = new YahtzeeGame();
 
             var rolls = player.Roll();
 
             Assert.That(yahtzee.PlayerScore(rolls), Is.EqualTo(5));
         }
+
+        [Test]
+        public void PlayerRolls_Twos_CalculatesCorrectScore()
+        {
+            var fakeDice = new FakeDice(setAllRollsTo: 2);
+            var player = new Player(fakeDice);
+
+            var yahtzee = new YahtzeeGame();
+
+            var rolls = player.Roll();
+
+            Assert.That(yahtzee.PlayerScore(rolls), Is.EqualTo(10));
+        }
+    }
+
+    public class FakeDice
+    {
+        public FakeDice(int setAllRollsTo)
+        {
+            Value = setAllRollsTo;
+        }
+
+        public int Value { get; private set; }
     }
 
     public class Player
     {
+        private readonly FakeDice fakeDice;
+
+        public Player(FakeDice fakeDice)
+        {
+            this.fakeDice = fakeDice;
+        }
+
         public int[] Roll()
         {
-            return new[] {1, 1, 1, 1, 1};
+            return new[] { fakeDice.Value, fakeDice.Value, fakeDice.Value, fakeDice.Value, fakeDice.Value };
         }
     }
 
@@ -40,8 +72,7 @@ namespace Kata.YahtzeeGame
     {
         public int PlayerScore(int[] rolls)
         {
-            if (!rolls.Any()) return 0;
-            return 5;
+            return rolls.Sum();
         }
     }
 }
