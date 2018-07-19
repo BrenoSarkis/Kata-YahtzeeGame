@@ -16,30 +16,21 @@ namespace Kata.YahtzeeGame
             Assert.That(yahtzee.PlayerScore(new int[0]), Is.EqualTo(0));
         }
 
-        [Test]
-        public void PlayerRolls_Ones_CalculatesCorrectScore()
+        [TestCase(1, 5)]
+        [TestCase(2, 10)]
+        [TestCase(3, 15)]
+        [TestCase(4, 20)]
+        [TestCase(5, 25)]
+        public void PlayerRolls_TheSameValueForEveryRow_CalculatesCorrectScore(int rollValue, int expectedScore)
         {
-            var fakeDice = new FakeDice(setAllRollsTo: 1);
+            var fakeDice = new FakeDice(setAllRollsTo: rollValue);
             var player = new Player(fakeDice);
 
             var yahtzee = new YahtzeeGame();
 
             var rolls = player.Roll();
 
-            Assert.That(yahtzee.PlayerScore(rolls), Is.EqualTo(5));
-        }
-
-        [Test]
-        public void PlayerRolls_Twos_CalculatesCorrectScore()
-        {
-            var fakeDice = new FakeDice(setAllRollsTo: 2);
-            var player = new Player(fakeDice);
-
-            var yahtzee = new YahtzeeGame();
-
-            var rolls = player.Roll();
-
-            Assert.That(yahtzee.PlayerScore(rolls), Is.EqualTo(10));
+            Assert.That(yahtzee.PlayerScore(rolls), Is.EqualTo(expectedScore));
         }
     }
 
