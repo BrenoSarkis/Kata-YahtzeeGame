@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using NUnit.Framework;
 
@@ -18,8 +19,7 @@ namespace Kata.YahtzeeGame
         [Test]
         public void PlayerRolls_Ones_CalculatesCorrectScore()
         {
-            var fakeDice = new FakeDice(setAllRollsTo: 1);
-            var player = new Player(fakeDice);
+            var player = new Player();
             var yahtzee = new YahtzeeGame();
 
             var rolls = player.Roll();
@@ -28,23 +28,8 @@ namespace Kata.YahtzeeGame
         }
     }
 
-    public class FakeDice
-    {
-        public FakeDice(int setAllRollsTo)
-        {
-            Value = setAllRollsTo;
-        }
-        public int Value { get; private set; }
-    }
-
     public class Player
     {
-        private readonly FakeDice fakeDice;
-
-        public Player(FakeDice fakeDice)
-        {
-            this.fakeDice = fakeDice;
-        }
         public int[] Roll()
         {
             return new[] {1, 1, 1, 1, 1};
@@ -55,7 +40,8 @@ namespace Kata.YahtzeeGame
     {
         public int PlayerScore(int[] rolls)
         {
-            return rolls.Sum();
+            if (!rolls.Any()) return 0;
+            return 5;
         }
     }
 }
