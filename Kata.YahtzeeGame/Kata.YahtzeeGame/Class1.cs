@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Threading;
+using NUnit.Framework;
 
 namespace Kata.YahtzeeGame
 {
@@ -6,9 +7,16 @@ namespace Kata.YahtzeeGame
     public class YahtzeeTests
     {
         [Test]
-        public void T()
+        public void WhenGameStarted_PlayerScoreIsZero()
         {
-            Assert.True(true);
+            var yahtzee = new YahtzeeGame();
+
+            Assert.That(yahtzee.PlayerScore, Is.EqualTo(0));
         }
+    }
+
+    public class YahtzeeGame
+    {
+        public int PlayerScore { get; } = 0;
     }
 }
