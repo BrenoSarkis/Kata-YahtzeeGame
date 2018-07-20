@@ -64,6 +64,23 @@ namespace Kata.YahtzeeGame
 
             Assert.That(yahtzee.CalculateScore(category, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(expectedScore));
         }
+
+        [Test]
+        public void PlayerRolls_Pairs()
+        {
+            var diceThatRollsOne = new FakeDice(willReturnOnRoll: 1);
+            var diceThatRollsTwo = new FakeDice(willReturnOnRoll: 2);
+            var player = new Player();
+            var yahtzee = new YahtzeeGame();
+
+            var firstRoll = player.Roll(diceThatRollsOne);
+            var secondRoll = player.Roll(diceThatRollsTwo);
+            var thirdRoll = player.Roll(diceThatRollsTwo);
+            var fourthRoll = player.Roll(diceThatRollsTwo);
+            var finalRoll = player.Roll(diceThatRollsOne);
+
+            Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(4));
+        }
     }
 
     public enum Category
@@ -74,7 +91,8 @@ namespace Kata.YahtzeeGame
         Threes,
         Fours,
         Fives,
-        Sixes
+        Sixes,
+        Pairs
     }
 
     public class FakeDice
@@ -113,6 +131,8 @@ namespace Kata.YahtzeeGame
                     return rolls.Where(r => r == (int)Category.Fives).Sum();
                 case Category.Sixes:
                     return rolls.Where(r => r == (int)Category.Sixes).Sum();
+                case Category.Pairs:
+                    return rolls.GroupBy(r=> r).Where(r => r.Count() > 1).Max(r => r.Key) * 2;
             }
 
             return rolls.Sum();
