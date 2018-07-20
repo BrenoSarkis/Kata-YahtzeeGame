@@ -10,10 +10,31 @@ namespace Kata.YahtzeeGame
     [TestFixture]
     public class YahtzeeTests
     {
+        private Player player;
+        private YahtzeeGame yahtzee;
+        private FakeDice diceThatRollsOne; 
+        private FakeDice diceThatRollsTwo;
+        private FakeDice diceThatRollsThree; 
+        private FakeDice diceThatRollsFour;
+        private FakeDice diceThatRollsFive;
+
+        [SetUp]
+        public void SetUp()
+        {
+            player = new Player();
+            yahtzee = new YahtzeeGame();
+
+            diceThatRollsOne = new FakeDice(willReturnOnRoll: 1);
+            diceThatRollsTwo = new FakeDice(willReturnOnRoll: 2);
+            diceThatRollsThree = new FakeDice(willReturnOnRoll: 3);
+            diceThatRollsFour = new FakeDice(willReturnOnRoll: 4);
+            diceThatRollsFive = new FakeDice(willReturnOnRoll: 5);
+        }
+
         [Test]
         public void WhenGameStarted_PlayerScoreIsZero()
         {
-            var yahtzee = new YahtzeeGame();
+            var yahtzee = this.yahtzee;
 
             Assert.That(yahtzee.CalculateScore(Category.Chance, 0), Is.EqualTo(0));
         }
@@ -27,8 +48,7 @@ namespace Kata.YahtzeeGame
         public void PlayerRolls_TheSameValueForEveryRow_CalculatesCorrectScore(int rollValue, int expectedScore)
         {
             var dice = new FakeDice(willReturnOnRoll: rollValue);
-            var player = new Player();
-            var yahtzee = new YahtzeeGame();
+            var yahtzee = this.yahtzee;
 
             var rolls = new[]
             {
@@ -52,9 +72,6 @@ namespace Kata.YahtzeeGame
         {
             var diceValue = new FakeDice(willReturnOnRoll: (int)category);
             var skippedDice = new FakeDice(willReturnOnRoll: (int)category -1);
-            var player = new Player();
-
-            var yahtzee = new YahtzeeGame();
 
             var firstRoll = player.Roll(diceValue);
             var secondRoll = player.Roll(diceValue);
@@ -68,11 +85,6 @@ namespace Kata.YahtzeeGame
         [Test]
         public void PlayerRolls_Pairs()
         {
-            var diceThatRollsOne = new FakeDice(willReturnOnRoll: 1);
-            var diceThatRollsTwo = new FakeDice(willReturnOnRoll: 2);
-            var player = new Player();
-            var yahtzee = new YahtzeeGame();
-
             var firstRoll = player.Roll(diceThatRollsOne);
             var secondRoll = player.Roll(diceThatRollsTwo);
             var thirdRoll = player.Roll(diceThatRollsTwo);
@@ -85,15 +97,6 @@ namespace Kata.YahtzeeGame
         [Test]
         public void PlayerRolls_Pairs_WhenThereAreNoPairsScoreIsZero()
         {
-            var diceThatRollsOne = new FakeDice(willReturnOnRoll: 1);
-            var diceThatRollsTwo = new FakeDice(willReturnOnRoll: 2);
-            var diceThatRollsThree = new FakeDice(willReturnOnRoll: 3);
-            var diceThatRollsFour = new FakeDice(willReturnOnRoll: 4);
-            var diceThatRollsFive = new FakeDice(willReturnOnRoll: 5);
-
-            var player = new Player();
-            var yahtzee = new YahtzeeGame();
-
             var firstRoll = player.Roll(diceThatRollsOne);
             var secondRoll = player.Roll(diceThatRollsTwo);
             var thirdRoll = player.Roll(diceThatRollsThree);
