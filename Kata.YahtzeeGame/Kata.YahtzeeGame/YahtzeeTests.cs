@@ -42,30 +42,39 @@ namespace Kata.YahtzeeGame
             Assert.That(yahtzee.CalculateScore(Category.Chance, rolls), Is.EqualTo(expectedScore));
         }
 
-        [Test]
-        public void PlayerRolls_OnlyTheDesiredValueIsConsideredOnScore()
+        [TestCase(Category.Ones, 4)]
+        [TestCase(Category.Twos, 8)]
+        [TestCase(Category.Threes, 12)]
+        [TestCase(Category.Fours, 16)]
+        [TestCase(Category.Fives, 20)]
+        [TestCase(Category.Sixes, 24)]
+        public void PlayerRolls_OnlyTheDesiredValueIsConsideredOnScore(Category category, int expectedScore)
         {
-            int expectedScore = 4;
-            var diceValueOne = new FakeDice(willReturnOnRoll: 1);
-            var diceValueTwo = new FakeDice(willReturnOnRoll: 2);
+            var diceValue = new FakeDice(willReturnOnRoll: (int)category);
+            var skippedDice = new FakeDice(willReturnOnRoll: (int)category -1);
             var player = new Player();
 
             var yahtzee = new YahtzeeGame();
 
-            var firstRoll = player.Roll(diceValueOne);
-            var secondRoll = player.Roll(diceValueTwo);
-            var thirdRoll = player.Roll(diceValueOne);
-            var fourthRoll = player.Roll(diceValueOne);
-            var finalRoll = player.Roll(diceValueOne);
+            var firstRoll = player.Roll(diceValue);
+            var secondRoll = player.Roll(diceValue);
+            var thirdRoll = player.Roll(diceValue);
+            var fourthRoll = player.Roll(diceValue);
+            var finalRoll = player.Roll(skippedDice);
 
-            Assert.That(yahtzee.CalculateScore(Category.Ones, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(expectedScore));
+            Assert.That(yahtzee.CalculateScore(category, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(expectedScore));
         }
     }
 
     public enum Category
     {
         Chance,
-        Ones
+        Ones,
+        Twos,
+        Threes,
+        Fours,
+        Fives,
+        Sixes
     }
 
     public class FakeDice
@@ -94,6 +103,16 @@ namespace Kata.YahtzeeGame
             {
                 case Category.Ones:
                     return rolls.Where(r => r == (int)Category.Ones).Sum();
+                case Category.Twos:
+                    return rolls.Where(r => r == (int)Category.Twos).Sum();
+                case Category.Threes:
+                    return rolls.Where(r => r == (int)Category.Threes).Sum();
+                case Category.Fours:
+                    return rolls.Where(r => r == (int)Category.Fours).Sum();
+                case Category.Fives:
+                    return rolls.Where(r => r == (int)Category.Fives).Sum();
+                case Category.Sixes:
+                    return rolls.Where(r => r == (int)Category.Sixes).Sum();
             }
 
             return rolls.Sum();
