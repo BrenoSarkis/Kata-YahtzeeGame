@@ -81,6 +81,27 @@ namespace Kata.YahtzeeGame
 
             Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(4));
         }
+
+        [Test]
+        public void PlayerRolls_Pairs_WhenThereAreNoPairsScoreIsZero()
+        {
+            var diceThatRollsOne = new FakeDice(willReturnOnRoll: 1);
+            var diceThatRollsTwo = new FakeDice(willReturnOnRoll: 2);
+            var diceThatRollsThree = new FakeDice(willReturnOnRoll: 3);
+            var diceThatRollsFour = new FakeDice(willReturnOnRoll: 4);
+            var diceThatRollsFive = new FakeDice(willReturnOnRoll: 5);
+
+            var player = new Player();
+            var yahtzee = new YahtzeeGame();
+
+            var firstRoll = player.Roll(diceThatRollsOne);
+            var secondRoll = player.Roll(diceThatRollsTwo);
+            var thirdRoll = player.Roll(diceThatRollsThree);
+            var fourthRoll = player.Roll(diceThatRollsFour);
+            var finalRoll = player.Roll(diceThatRollsFive);
+
+            Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
+        }
     }
 
     public enum Category
@@ -132,7 +153,8 @@ namespace Kata.YahtzeeGame
                 case Category.Sixes:
                     return rolls.Where(r => r == (int)Category.Sixes).Sum();
                 case Category.Pairs:
-                    return rolls.GroupBy(r=> r).Where(r => r.Count() > 1).Max(r => r.Key) * 2;
+                    var pairs = rolls.GroupBy(r => r).Where(r => r.Count() > 1);
+                    return pairs.Any() ? pairs.Max(r => r.Key) * 2 : 0;
             }
 
             return rolls.Sum();
