@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
@@ -12,9 +13,9 @@ namespace Kata.YahtzeeGame
     {
         private Player player;
         private YahtzeeGame yahtzee;
-        private FakeDice diceThatRollsOne; 
+        private FakeDice diceThatRollsOne;
         private FakeDice diceThatRollsTwo;
-        private FakeDice diceThatRollsThree; 
+        private FakeDice diceThatRollsThree;
         private FakeDice diceThatRollsFour;
         private FakeDice diceThatRollsFive;
 
@@ -71,7 +72,7 @@ namespace Kata.YahtzeeGame
         public void PlayerRolls_OnlyTheDesiredValueIsConsideredOnScore(Category category, int expectedScore)
         {
             var diceValue = new FakeDice(willReturnOnRoll: (int)category);
-            var skippedDice = new FakeDice(willReturnOnRoll: (int)category -1);
+            var skippedDice = new FakeDice(willReturnOnRoll: (int)category - 1);
 
             var firstRoll = player.Roll(diceValue);
             var secondRoll = player.Roll(diceValue);
@@ -85,13 +86,13 @@ namespace Kata.YahtzeeGame
         [Test]
         public void PlayerRolls_Pairs()
         {
-            var firstRoll = player.Roll(diceThatRollsOne);
-            var secondRoll = player.Roll(diceThatRollsTwo);
-            var thirdRoll = player.Roll(diceThatRollsTwo);
-            var fourthRoll = player.Roll(diceThatRollsTwo);
-            var finalRoll = player.Roll(diceThatRollsOne);
+            var firstRoll = player.Roll(diceThatRollsThree);
+            var secondRoll = player.Roll(diceThatRollsThree);
+            var thirdRoll = player.Roll(diceThatRollsThree);
+            var fourthRoll = player.Roll(diceThatRollsFour);
+            var finalRoll = player.Roll(diceThatRollsFour);
 
-            Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(4));
+            Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(8));
         }
 
         [Test]
@@ -158,7 +159,7 @@ namespace Kata.YahtzeeGame
     {
         public int Roll(FakeDice fakeDice)
         {
-            return  fakeDice.Value;
+            return fakeDice.Value;
         }
     }
 
@@ -181,19 +182,23 @@ namespace Kata.YahtzeeGame
                 case Category.Sixes:
                     return rolls.Where(r => r == (int)Category.Sixes).Sum();
                 case Category.Pairs:
-                {
-                    var pairs = rolls.GroupBy(r => r).Where(r => r.Count() > 1).Select(r => r.Key).Distinct();
-                    return pairs.Any() ? pairs.Max(r => r) * 2 : 0;
-                }
+                    {
+                        var number = FindNumbersThatHasAPair(rolls).Take(1);
+                        return number.Count() == 1 ? number.Sum(p => p * 2) : 0;
+                    }
                 case Category.TwoPairs:
-                {
-                    var pairs = rolls.GroupBy(r => r).Where(r => r.Count() > 1).Select(r => r.Key).Distinct();
-                    var twoPairs = pairs.OrderByDescending(p => p).Take(2);
-                    return twoPairs.Count() == 2 ? twoPairs.Sum(p => p * 2) : 0;
-                }
+                    {
+                        var twoNumbers = FindNumbersThatHasAPair(rolls).Take(2);
+                        return twoNumbers.Count() == 2 ? twoNumbers.Sum(p => p * 2) : 0;
+                    }
             }
 
             return rolls.Sum();
+        }
+
+        private static IEnumerable<int> FindNumbersThatHasAPair(int[] rolls)
+        {
+            return rolls.GroupBy(r => r).Where(r => r.Count() == 2).Select(r => r.Key).Distinct().OrderByDescending(p => p);
         }
     }
 }
