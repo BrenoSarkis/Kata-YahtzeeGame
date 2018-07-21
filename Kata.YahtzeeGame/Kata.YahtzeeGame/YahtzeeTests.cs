@@ -130,6 +130,30 @@ namespace Kata.YahtzeeGame
 
             Assert.That(yahtzee.CalculateScore(Category.TwoPairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
         }
+
+        [Test]
+        public void PlayerRolls_ThreeOfAKind()
+        {
+            var firstRoll = player.Roll(diceThatRollsThree);
+            var secondRoll = player.Roll(diceThatRollsThree);
+            var thirdRoll = player.Roll(diceThatRollsThree);
+            var fourthRoll = player.Roll(diceThatRollsFour);
+            var finalRoll = player.Roll(diceThatRollsFive);
+
+            Assert.That(yahtzee.CalculateScore(Category.ThreeOfAKind, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(9));
+        }
+
+        [Test]
+        public void PlayerRolls_ThreeOfAKind_WhenThereAreNoTriplesScoreIsZero()
+        {
+            var firstRoll = player.Roll(diceThatRollsThree);
+            var secondRoll = player.Roll(diceThatRollsThree);
+            var thirdRoll = player.Roll(diceThatRollsTwo);
+            var fourthRoll = player.Roll(diceThatRollsFour);
+            var finalRoll = player.Roll(diceThatRollsFive);
+
+            Assert.That(yahtzee.CalculateScore(Category.ThreeOfAKind, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
+        }
     }
 
     public enum Category
@@ -142,7 +166,8 @@ namespace Kata.YahtzeeGame
         Fives,
         Sixes,
         Pairs,
-        TwoPairs
+        TwoPairs,
+        ThreeOfAKind
     }
 
     public class FakeDice
@@ -183,22 +208,26 @@ namespace Kata.YahtzeeGame
                     return rolls.Where(r => r == (int)Category.Sixes).Sum();
                 case Category.Pairs:
                     {
-                        var number = FindNumbersThatHasAPair(rolls).Take(1);
+                        var number = FindNumbersThatRepeat(rolls, numberOfTimes: 2).Take(1);
                         return number.Count() == 1 ? number.Sum(p => p * 2) : 0;
                     }
                 case Category.TwoPairs:
                     {
-                        var twoNumbers = FindNumbersThatHasAPair(rolls).Take(2);
+                        var twoNumbers = FindNumbersThatRepeat(rolls, numberOfTimes: 2).Take(2);
                         return twoNumbers.Count() == 2 ? twoNumbers.Sum(p => p * 2) : 0;
                     }
+                case Category.ThreeOfAKind:
+                    var threeOfAKind = FindNumbersThatRepeat(rolls, numberOfTimes: 3).Take(1);
+                    return threeOfAKind.Count() == 1 ? threeOfAKind.First() * 3 : 0;
+
             }
 
             return rolls.Sum();
         }
 
-        private static IEnumerable<int> FindNumbersThatHasAPair(int[] rolls)
+        private static IEnumerable<int> FindNumbersThatRepeat(int[] rolls, int numberOfTimes)
         {
-            return rolls.GroupBy(r => r).Where(r => r.Count() == 2).Select(r => r.Key).Distinct().OrderByDescending(p => p);
+            return rolls.GroupBy(r => r).Where(r => r.Count() == numberOfTimes).Select(r => r.Key).Distinct().OrderByDescending(p => p);
         }
     }
 }
