@@ -117,6 +117,18 @@ namespace Kata.YahtzeeGame
 
             Assert.That(yahtzee.CalculateScore(Category.TwoPairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(8));
         }
+
+        [Test]
+        public void PlayerRolls_TwoPairs_WhenThereAreNoTwoPairsScoreIsZero()
+        {
+            var firstRoll = player.Roll(diceThatRollsOne);
+            var secondRoll = player.Roll(diceThatRollsOne);
+            var thirdRoll = player.Roll(diceThatRollsTwo);
+            var fourthRoll = player.Roll(diceThatRollsThree);
+            var finalRoll = player.Roll(diceThatRollsFour);
+
+            Assert.That(yahtzee.CalculateScore(Category.TwoPairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
+        }
     }
 
     public enum Category
@@ -177,7 +189,7 @@ namespace Kata.YahtzeeGame
                 {
                     var pairs = rolls.GroupBy(r => r).Where(r => r.Count() > 1).Select(r => r.Key).Distinct();
                     var twoPairs = pairs.OrderByDescending(p => p).Take(2);
-                    return twoPairs.Sum(p => p * 2);
+                    return twoPairs.Count() == 2 ? twoPairs.Sum(p => p * 2) : 0;
                 }
             }
 
