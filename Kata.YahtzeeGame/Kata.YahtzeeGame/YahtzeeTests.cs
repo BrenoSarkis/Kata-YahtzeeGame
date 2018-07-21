@@ -105,6 +105,18 @@ namespace Kata.YahtzeeGame
 
             Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
         }
+
+        [Test]
+        public void PlayerRolls_TwoPairs()
+        {
+            var firstRoll = player.Roll(diceThatRollsOne);
+            var secondRoll = player.Roll(diceThatRollsOne);
+            var thirdRoll = player.Roll(diceThatRollsTwo);
+            var fourthRoll = player.Roll(diceThatRollsThree);
+            var finalRoll = player.Roll(diceThatRollsThree);
+
+            Assert.That(yahtzee.CalculateScore(Category.TwoPairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(8));
+        }
     }
 
     public enum Category
@@ -116,7 +128,8 @@ namespace Kata.YahtzeeGame
         Fours,
         Fives,
         Sixes,
-        Pairs
+        Pairs,
+        TwoPairs
     }
 
     public class FakeDice
@@ -156,8 +169,16 @@ namespace Kata.YahtzeeGame
                 case Category.Sixes:
                     return rolls.Where(r => r == (int)Category.Sixes).Sum();
                 case Category.Pairs:
-                    var pairs = rolls.GroupBy(r => r).Where(r => r.Count() > 1);
-                    return pairs.Any() ? pairs.Max(r => r.Key) * 2 : 0;
+                {
+                    var pairs = rolls.GroupBy(r => r).Where(r => r.Count() > 1).Select(r => r.Key).Distinct();
+                    return pairs.Any() ? pairs.Max(r => r) * 2 : 0;
+                }
+                case Category.TwoPairs:
+                {
+                    var pairs = rolls.GroupBy(r => r).Where(r => r.Count() > 1).Select(r => r.Key).Distinct();
+                    var twoPairs = pairs.OrderByDescending(p => p).Take(2);
+                    return twoPairs.Sum(p => p * 2);
+                }
             }
 
             return rolls.Sum();
