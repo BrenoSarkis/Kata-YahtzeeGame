@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
@@ -13,23 +14,12 @@ namespace Kata.YahtzeeGame
     {
         private Player player;
         private YahtzeeGame yahtzee;
-        private FakeDice diceThatRollsOne;
-        private FakeDice diceThatRollsTwo;
-        private FakeDice diceThatRollsThree;
-        private FakeDice diceThatRollsFour;
-        private FakeDice diceThatRollsFive;
 
         [SetUp]
         public void SetUp()
         {
             player = new Player();
             yahtzee = new YahtzeeGame();
-
-            diceThatRollsOne = new FakeDice(willReturnOnRoll: 1);
-            diceThatRollsTwo = new FakeDice(willReturnOnRoll: 2);
-            diceThatRollsThree = new FakeDice(willReturnOnRoll: 3);
-            diceThatRollsFour = new FakeDice(willReturnOnRoll: 4);
-            diceThatRollsFive = new FakeDice(willReturnOnRoll: 5);
         }
 
         [Test]
@@ -40,119 +30,29 @@ namespace Kata.YahtzeeGame
             Assert.That(yahtzee.CalculateScore(Category.Chance, 0), Is.EqualTo(0));
         }
 
-        [TestCase(1, 5)]
-        [TestCase(2, 10)]
-        [TestCase(3, 15)]
-        [TestCase(4, 20)]
-        [TestCase(5, 25)]
-        [TestCase(6, 30)]
-        public void PlayerRolls_TheSameValueForEveryRow_CalculatesCorrectScore(int rollValue, int expectedScore)
+        [TestCase(Category.Chance, new[] { 1, 2, 3, 4, 5 }, 15, TestName = "Chance")]
+        [TestCase(Category.Ones, new[] { 1, 1, 1, 1, 2 }, 4, TestName = "Ones")]
+        [TestCase(Category.Twos, new[] { 2, 2, 2, 2, 3 }, 8, TestName = "Twos")]
+        [TestCase(Category.Threes, new[] { 3, 3, 3, 3, 4 }, 12, TestName = "Threes")]
+        [TestCase(Category.Fours, new[] { 4, 4, 4, 4, 5 }, 16, TestName = "Fours")]
+        [TestCase(Category.Fives, new[] { 5, 5, 5, 5, 6 }, 20, TestName = "Fives")]
+        [TestCase(Category.Sixes, new[] { 6, 6, 6, 6, 5 }, 24, TestName = "Sixes")]
+        [TestCase(Category.Pairs, new[] { 3, 3, 3, 4, 4 }, 8, TestName = "Pairs")]
+        [TestCase(Category.Pairs, new[] { 1, 2, 3, 4, 5 }, 0, TestName = "Pairs_NoPairs_ScoreIsZero")]
+        [TestCase(Category.TwoPairs, new[] { 1, 1, 2, 3, 3 }, 8, TestName = "TwoPairs")]
+        [TestCase(Category.TwoPairs, new[] { 1, 1, 2, 3, 4 }, 0, TestName = "TwoPairs_NoTwoPairs_ScoreIsZero")]
+        [TestCase(Category.ThreeOfAKind, new[] { 3, 3, 3, 4, 4 }, 9, TestName = "ThreeOfAKind")]
+        [TestCase(Category.ThreeOfAKind, new[] { 3, 3, 2, 4, 4 }, 0, TestName = "ThreeOfAKind_NoTriples_ScoreIsZero")]
+        public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
-            var dice = new FakeDice(willReturnOnRoll: rollValue);
-            var yahtzee = this.yahtzee;
+            var rolls = CollectRolls(player, dices).ToArray();
 
-            var rolls = new[]
-            {
-                player.Roll(dice),
-                player.Roll(dice),
-                player.Roll(dice),
-                player.Roll(dice),
-                player.Roll(dice),
-            };
-
-            Assert.That(yahtzee.CalculateScore(Category.Chance, rolls), Is.EqualTo(expectedScore));
+            Assert.That(yahtzee.CalculateScore(category, rolls), Is.EqualTo(expectedScore));
         }
 
-        [TestCase(Category.Ones, 4)]
-        [TestCase(Category.Twos, 8)]
-        [TestCase(Category.Threes, 12)]
-        [TestCase(Category.Fours, 16)]
-        [TestCase(Category.Fives, 20)]
-        [TestCase(Category.Sixes, 24)]
-        public void PlayerRolls_OnlyTheDesiredValueIsConsideredOnScore(Category category, int expectedScore)
+        private IEnumerable<int> CollectRolls(Player player, params int[] dices)
         {
-            var diceValue = new FakeDice(willReturnOnRoll: (int)category);
-            var skippedDice = new FakeDice(willReturnOnRoll: (int)category - 1);
-
-            var firstRoll = player.Roll(diceValue);
-            var secondRoll = player.Roll(diceValue);
-            var thirdRoll = player.Roll(diceValue);
-            var fourthRoll = player.Roll(diceValue);
-            var finalRoll = player.Roll(skippedDice);
-
-            Assert.That(yahtzee.CalculateScore(category, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(expectedScore));
-        }
-
-        [Test]
-        public void PlayerRolls_Pairs()
-        {
-            var firstRoll = player.Roll(diceThatRollsThree);
-            var secondRoll = player.Roll(diceThatRollsThree);
-            var thirdRoll = player.Roll(diceThatRollsThree);
-            var fourthRoll = player.Roll(diceThatRollsFour);
-            var finalRoll = player.Roll(diceThatRollsFour);
-
-            Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(8));
-        }
-
-        [Test]
-        public void PlayerRolls_Pairs_WhenThereAreNoPairsScoreIsZero()
-        {
-            var firstRoll = player.Roll(diceThatRollsOne);
-            var secondRoll = player.Roll(diceThatRollsTwo);
-            var thirdRoll = player.Roll(diceThatRollsThree);
-            var fourthRoll = player.Roll(diceThatRollsFour);
-            var finalRoll = player.Roll(diceThatRollsFive);
-
-            Assert.That(yahtzee.CalculateScore(Category.Pairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
-        }
-
-        [Test]
-        public void PlayerRolls_TwoPairs()
-        {
-            var firstRoll = player.Roll(diceThatRollsOne);
-            var secondRoll = player.Roll(diceThatRollsOne);
-            var thirdRoll = player.Roll(diceThatRollsTwo);
-            var fourthRoll = player.Roll(diceThatRollsThree);
-            var finalRoll = player.Roll(diceThatRollsThree);
-
-            Assert.That(yahtzee.CalculateScore(Category.TwoPairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(8));
-        }
-
-        [Test]
-        public void PlayerRolls_TwoPairs_WhenThereAreNoTwoPairsScoreIsZero()
-        {
-            var firstRoll = player.Roll(diceThatRollsOne);
-            var secondRoll = player.Roll(diceThatRollsOne);
-            var thirdRoll = player.Roll(diceThatRollsTwo);
-            var fourthRoll = player.Roll(diceThatRollsThree);
-            var finalRoll = player.Roll(diceThatRollsFour);
-
-            Assert.That(yahtzee.CalculateScore(Category.TwoPairs, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
-        }
-
-        [Test]
-        public void PlayerRolls_ThreeOfAKind()
-        {
-            var firstRoll = player.Roll(diceThatRollsThree);
-            var secondRoll = player.Roll(diceThatRollsThree);
-            var thirdRoll = player.Roll(diceThatRollsThree);
-            var fourthRoll = player.Roll(diceThatRollsFour);
-            var finalRoll = player.Roll(diceThatRollsFive);
-
-            Assert.That(yahtzee.CalculateScore(Category.ThreeOfAKind, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(9));
-        }
-
-        [Test]
-        public void PlayerRolls_ThreeOfAKind_WhenThereAreNoTriplesScoreIsZero()
-        {
-            var firstRoll = player.Roll(diceThatRollsThree);
-            var secondRoll = player.Roll(diceThatRollsThree);
-            var thirdRoll = player.Roll(diceThatRollsTwo);
-            var fourthRoll = player.Roll(diceThatRollsFour);
-            var finalRoll = player.Roll(diceThatRollsFive);
-
-            Assert.That(yahtzee.CalculateScore(Category.ThreeOfAKind, firstRoll, secondRoll, thirdRoll, fourthRoll, finalRoll), Is.EqualTo(0));
+            return dices.Select(dice => player.Roll(new FakeDice(willReturnOnRoll: dice)));
         }
     }
 
