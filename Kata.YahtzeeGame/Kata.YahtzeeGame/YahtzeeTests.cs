@@ -44,6 +44,7 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.ThreeOfAKind, new[] { 3, 3, 3, 4, 4 }, 9, TestName = "ThreeOfAKind")]
         [TestCase(Category.ThreeOfAKind, new[] { 3, 3, 2, 4, 4 }, 0, TestName = "ThreeOfAKind_NoTriples_ScoreIsZero")]
         [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 2, 5 }, 8, TestName = "FourOfAKind")]
+        [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 3, 5 }, 0, TestName = "FourOfAKind_NoFourOfAKind_ScoreIsZero")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
             var rolls = CollectRolls(player, dices).ToArray();
@@ -120,11 +121,10 @@ namespace Kata.YahtzeeGame
                     }
                 case Category.ThreeOfAKind:
                     var threeOfAKind = FindNumbersThatRepeat(rolls, numberOfTimes: 3).Take(1);
-                    return threeOfAKind.Count() == 1 ? threeOfAKind.First() * 3 : 0;
+                    return threeOfAKind.Count() == 1 ? threeOfAKind.Sum(t => t * 3) : 0;
                 case Category.FourOfAKind:
                     var fourOfAKind = FindNumbersThatRepeat(rolls, numberOfTimes: 4).Take(1);
-                    return fourOfAKind.Sum(f => f * 4);
-
+                    return fourOfAKind.Count() == 1 ? fourOfAKind.Sum(f => f * 4) : 0;
             }
 
             return rolls.Sum();
