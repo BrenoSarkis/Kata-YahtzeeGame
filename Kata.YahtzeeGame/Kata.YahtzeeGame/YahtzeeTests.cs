@@ -110,24 +110,22 @@ namespace Kata.YahtzeeGame
                 case Category.Sixes:
                     return rolls.Where(r => r == (int)Category.Sixes).Sum();
                 case Category.Pairs:
-                    {
-                        var number = FindNumbersThatRepeat(rolls, numberOfTimes: 2).Take(1);
-                        return number.Count() == 1 ? number.Sum(p => p * 2) : 0;
-                    }
+                    return ScoreRepetitions(rolls, timesTheyRepeat: 2, numberOfReps: 1);
                 case Category.TwoPairs:
-                    {
-                        var twoNumbers = FindNumbersThatRepeat(rolls, numberOfTimes: 2).Take(2);
-                        return twoNumbers.Count() == 2 ? twoNumbers.Sum(p => p * 2) : 0;
-                    }
+                    return ScoreRepetitions(rolls, timesTheyRepeat: 2, numberOfReps: 2);
                 case Category.ThreeOfAKind:
-                    var threeOfAKind = FindNumbersThatRepeat(rolls, numberOfTimes: 3).Take(1);
-                    return threeOfAKind.Count() == 1 ? threeOfAKind.Sum(t => t * 3) : 0;
+                    return ScoreRepetitions(rolls, timesTheyRepeat: 3, numberOfReps: 1);
                 case Category.FourOfAKind:
-                    var fourOfAKind = FindNumbersThatRepeat(rolls, numberOfTimes: 4).Take(1);
-                    return fourOfAKind.Count() == 1 ? fourOfAKind.Sum(f => f * 4) : 0;
+                    return ScoreRepetitions(rolls, timesTheyRepeat: 4, numberOfReps: 1);
             }
 
             return rolls.Sum();
+        }
+
+        private int ScoreRepetitions(int[] rolls, int timesTheyRepeat, int numberOfReps)
+        {
+            var repeated = FindNumbersThatRepeat(rolls, numberOfTimes: timesTheyRepeat).Take(numberOfReps).ToArray();
+            return repeated.Length == numberOfReps ? repeated.Sum(f => f * timesTheyRepeat) : 0;
         }
 
         private static IEnumerable<int> FindNumbersThatRepeat(int[] rolls, int numberOfTimes)
