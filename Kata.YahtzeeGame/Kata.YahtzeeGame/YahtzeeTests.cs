@@ -46,6 +46,7 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 2, 5 }, 8, TestName = "FourOfAKind")]
         [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 3, 5 }, 0, TestName = "FourOfAKind_NoFourOfAKind_ScoreIsZero")]
         [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 5 }, 15, TestName = "SmallStraight")]
+        [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 1 }, 0, TestName = "SmallStraight_InvalidSequence_ScoreIsZero")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
             var rolls = CollectRolls(player, dices).ToArray();
@@ -120,7 +121,7 @@ namespace Kata.YahtzeeGame
                 case Category.FourOfAKind:
                     return ScoreRepetitions(rolls, timesTheyRepeat: 4, numberOfReps: 1);
                 case Category.SmallStraight:
-                    return 15;
+                    return rolls.SequenceEqual(new[] { 1, 2, 3, 4, 5 }) ? 15 : 0;
             }
 
             return rolls.Sum();
