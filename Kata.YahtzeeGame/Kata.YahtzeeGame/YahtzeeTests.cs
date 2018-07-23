@@ -53,6 +53,7 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.LargeStraight, new[] { 2, 4, 4, 5, 6 }, 0, TestName = "LargeStraight_InvalidSequence_ScoreIsZero")]
         [TestCase(Category.FullHouse, new[] { 2, 2, 3, 3, 3 }, 25, TestName = "FullHouse")]
         [TestCase(Category.FullHouse, new[] { 4, 4, 4, 4, 4 }, 0, TestName = "FullHouse_InvalidSequences_ScoreIsZero")]
+        [TestCase(Category.Yahtzee, new[] { 1, 1, 1, 1, 1 }, 50, TestName = "Yahtzee_OfOnes")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
             var rolls = CollectRolls(player, dices).ToArray();
@@ -81,7 +82,8 @@ namespace Kata.YahtzeeGame
         FourOfAKind,
         SmallStraight,
         LargeStraight,
-        FullHouse
+        FullHouse,
+        Yahtzee
     }
 
     public class FakeDice
@@ -144,6 +146,8 @@ namespace Kata.YahtzeeGame
                     var pair = FindNumbersThatRepeat(rolls.Where(r => r != threeOfAKind.First()).ToArray(), 2);
                     if (pair.Count() == 1) return 25;
                     return 0;
+                case Category.Yahtzee:
+                    return 50;
             }
 
             return rolls.Sum();
