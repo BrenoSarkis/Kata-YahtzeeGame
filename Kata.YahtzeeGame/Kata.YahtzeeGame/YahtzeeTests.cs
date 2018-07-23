@@ -45,8 +45,8 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.ThreeOfAKind, new[] { 3, 3, 2, 4, 4 }, 0, TestName = "ThreeOfAKind_NoTriples_ScoreIsZero")]
         [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 2, 5 }, 8, TestName = "FourOfAKind")]
         [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 3, 5 }, 0, TestName = "FourOfAKind_NoFourOfAKind_ScoreIsZero")]
-        [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 5 }, 15, TestName = "SmallStraight")]
-        [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 1 }, 0, TestName = "SmallStraight_InvalidSequence_ScoreIsZero")]
+        [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 5 }, 30, TestName = "SmallStraight")]
+        [TestCase(Category.SmallStraight, new[] { 1, 3, 3, 4, 1 }, 0, TestName = "SmallStraight_InvalidSequence_ScoreIsZero")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
             var rolls = CollectRolls(player, dices).ToArray();
@@ -121,7 +121,10 @@ namespace Kata.YahtzeeGame
                 case Category.FourOfAKind:
                     return ScoreRepetitions(rolls, timesTheyRepeat: 4, numberOfReps: 1);
                 case Category.SmallStraight:
-                    return rolls.SequenceEqual(new[] { 1, 2, 3, 4, 5 }) ? 15 : 0;
+                    var possibleSmallStraights = new[] {new []{ 1, 2, 3, 4},
+                                                        new []{ 2, 3, 4, 5},
+                                                        new []{ 3, 4, 5, 6}};
+                    return possibleSmallStraights.Any(combination => rolls.Except(combination).Count() == 1) ? 30 : 0;
             }
 
             return rolls.Sum();
