@@ -52,6 +52,7 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.LargeStraight, new[] { 1, 2, 3, 4, 5 }, 40, TestName = "LargeStraight_OneToFive")]
         [TestCase(Category.LargeStraight, new[] { 2, 4, 4, 5, 6 }, 0, TestName = "LargeStraight_InvalidSequence_ScoreIsZero")]
         [TestCase(Category.FullHouse, new[] { 2, 2, 3, 3, 3 }, 25, TestName = "FullHouse")]
+        [TestCase(Category.FullHouse, new[] { 4, 4, 4, 4, 4 }, 0, TestName = "FullHouse_InvalidSequences_ScoreIsZero")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
             var rolls = CollectRolls(player, dices).ToArray();
