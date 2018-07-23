@@ -48,7 +48,8 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 1 }, 30, TestName = "SmallStraight_SequenceAtTheBeginning")]
         [TestCase(Category.SmallStraight, new[] { 1, 1, 2, 3, 4 }, 30, TestName = "SmallStraight_SequenceAtTheEnd")]
         [TestCase(Category.SmallStraight, new[] { 1, 3, 3, 4, 1 }, 0, TestName = "SmallStraight_InvalidSequence_ScoreIsZero")]
-        [TestCase(Category.LargeStraight, new[] { 2, 3, 4, 5, 6 }, 40, TestName = "LargeStraight")]
+        [TestCase(Category.LargeStraight, new[] { 2, 3, 4, 5, 6 }, 40, TestName = "LargeStraight_TwoToSix")]
+        [TestCase(Category.LargeStraight, new[] { 1, 2, 3, 4, 5 }, 40, TestName = "LargeStraight_OneToFive")]
         [TestCase(Category.LargeStraight, new[] { 2, 4, 4, 5, 6 }, 0, TestName = "LargeStraight_InvalidSequence_ScoreIsZero")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
