@@ -45,7 +45,8 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.ThreeOfAKind, new[] { 3, 3, 2, 4, 4 }, 0, TestName = "ThreeOfAKind_NoTriples_ScoreIsZero")]
         [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 2, 5 }, 8, TestName = "FourOfAKind")]
         [TestCase(Category.FourOfAKind, new[] { 2, 2, 2, 3, 5 }, 0, TestName = "FourOfAKind_NoFourOfAKind_ScoreIsZero")]
-        [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 5 }, 30, TestName = "SmallStraight")]
+        [TestCase(Category.SmallStraight, new[] { 1, 2, 3, 4, 1 }, 30, TestName = "SmallStraight_SequenceAtTheBeginning")]
+        [TestCase(Category.SmallStraight, new[] { 1, 1, 2, 3, 4 }, 30, TestName = "SmallStraight_SequenceAtTheEnd")]
         [TestCase(Category.SmallStraight, new[] { 1, 3, 3, 4, 1 }, 0, TestName = "SmallStraight_InvalidSequence_ScoreIsZero")]
         [TestCase(Category.LargeStraight, new[] { 2, 3, 4, 5, 6 }, 40, TestName = "LargeStraight")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
@@ -126,7 +127,9 @@ namespace Kata.YahtzeeGame
                     var possibleSmallStraights = new[] {new []{ 1, 2, 3, 4},
                                                         new []{ 2, 3, 4, 5},
                                                         new []{ 3, 4, 5, 6}};
-                    return possibleSmallStraights.Any(combination => rolls.Skip(1).SequenceEqual(combination)) ? 30 : 0;
+                    var SequenceExistsAtBeginningOrEnd = possibleSmallStraights.Any(combination => rolls.Skip(1).SequenceEqual(combination) 
+                                                                                                || rolls.Take(4).SequenceEqual(combination));
+                    return SequenceExistsAtBeginningOrEnd ? 30 : 0;
                 case Category.LargeStraight:
                     var possibleLargeStraights = new[] {new []{ 2, 3, 4, 5, 6}, new []{ 1, 2, 3, 4, 5}};
                     return possibleLargeStraights.Any(rolls.SequenceEqual) ? 40 : 0;
