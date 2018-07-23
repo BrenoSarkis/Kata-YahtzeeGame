@@ -53,7 +53,8 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.LargeStraight, new[] { 2, 4, 4, 5, 6 }, 0, TestName = "LargeStraight_InvalidSequence_ScoreIsZero")]
         [TestCase(Category.FullHouse, new[] { 2, 2, 3, 3, 3 }, 25, TestName = "FullHouse")]
         [TestCase(Category.FullHouse, new[] { 4, 4, 4, 4, 4 }, 0, TestName = "FullHouse_InvalidSequences_ScoreIsZero")]
-        [TestCase(Category.Yahtzee, new[] { 1, 1, 1, 1, 1 }, 50, TestName = "Yahtzee_OfOnes")]
+        [TestCase(Category.Yahtzee, new[] { 1, 1, 1, 1, 2 }, 0, TestName = "Yahtzee_InvalidSequence_ScoreIsZero")]
+        [TestCase(Category.Yahtzee, new[] { 1, 1, 1, 1, 1 }, 50, TestName = "Yahtzee")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
             var rolls = CollectRolls(player, dices).ToArray();
@@ -147,7 +148,7 @@ namespace Kata.YahtzeeGame
                     if (pair.Count() == 1) return 25;
                     return 0;
                 case Category.Yahtzee:
-                    return 50;
+                    return rolls.All(r => r == rolls.First()) ? 50 : 0;
             }
 
             return rolls.Sum();
