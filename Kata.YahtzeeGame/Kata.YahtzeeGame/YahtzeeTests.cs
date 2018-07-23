@@ -51,6 +51,7 @@ namespace Kata.YahtzeeGame
         [TestCase(Category.LargeStraight, new[] { 2, 3, 4, 5, 6 }, 40, TestName = "LargeStraight_TwoToSix")]
         [TestCase(Category.LargeStraight, new[] { 1, 2, 3, 4, 5 }, 40, TestName = "LargeStraight_OneToFive")]
         [TestCase(Category.LargeStraight, new[] { 2, 4, 4, 5, 6 }, 0, TestName = "LargeStraight_InvalidSequence_ScoreIsZero")]
+        [TestCase(Category.FullHouse, new[] { 2, 2, 3, 3, 3 }, 25, TestName = "FullHouse")]
         public void Yahtzee(Category category, int[] dices, int expectedScore)
         {
             var rolls = CollectRolls(player, dices).ToArray();
@@ -78,7 +79,8 @@ namespace Kata.YahtzeeGame
         ThreeOfAKind,
         FourOfAKind,
         SmallStraight,
-        LargeStraight
+        LargeStraight,
+        FullHouse
     }
 
     public class FakeDice
@@ -129,12 +131,18 @@ namespace Kata.YahtzeeGame
                     var possibleSmallStraights = new[] {new []{ 1, 2, 3, 4},
                                                         new []{ 2, 3, 4, 5},
                                                         new []{ 3, 4, 5, 6}};
-                    var SequenceExistsAtBeginningOrEnd = possibleSmallStraights.Any(combination => rolls.Skip(1).SequenceEqual(combination) 
+                    var sequenceExistsAtBeginningOrEnd = possibleSmallStraights.Any(combination => rolls.Skip(1).SequenceEqual(combination) 
                                                                                                 || rolls.Take(4).SequenceEqual(combination));
-                    return SequenceExistsAtBeginningOrEnd ? 30 : 0;
+                    return sequenceExistsAtBeginningOrEnd ? 30 : 0;
                 case Category.LargeStraight:
                     var possibleLargeStraights = new[] {new []{ 2, 3, 4, 5, 6}, new []{ 1, 2, 3, 4, 5}};
                     return possibleLargeStraights.Any(rolls.SequenceEqual) ? 40 : 0;
+                case Category.FullHouse:
+                    var threeOfAKind = FindNumbersThatRepeat(rolls, 3);
+                    if (threeOfAKind.Count() != 1) return 0;
+                    var pair = FindNumbersThatRepeat(rolls.Where(r => r != threeOfAKind.First()).ToArray(), 2);
+                    if (pair.Count() == 1) return 25;
+                    return 0;
             }
 
             return rolls.Sum();
