@@ -1,5 +1,4 @@
 # Kata-YahtzeeGame
-
 <pre><code>The game of yahtzee is a simple dice game. Each player rolls five
 six-sided dice. They can re-roll some or all of the dice up to three
 times (including the original roll).
