@@ -26,7 +26,6 @@ You do NOT have to program the random dice rolling.
 The game is NOT played by letting the computer choose the highest scoring
 category for a given roll.
 
-
 Yahzee Categories and Scoring Rules
 ===================================
 
